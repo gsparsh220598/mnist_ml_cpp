@@ -21,6 +21,7 @@ public:
     void set_training_set(std::vector<data *> *vect);
     void set_test_set(std::vector<data *> *vect);
     void set_validation_set(std::vector<data *> *vect);
+    void set_k(int);
 
     int predict();
     double calc_distance(data *query_point, data *input);

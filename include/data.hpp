@@ -26,6 +26,7 @@ public:
     int get_enum_label();
 
     std::vector<uint8_t> *get_feature_vector();
+    double get_distance();
 };
 
 #endif

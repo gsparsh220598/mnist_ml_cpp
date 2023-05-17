@@ -67,21 +67,6 @@ void knn::find_knearest(data *query_point)
     }
 }
 
-void knn::set_training_set(std::vector<data *> *vect)
-{
-    train_set = vect;
-}
-
-void knn::set_test_set(std::vector<data *> *vect)
-{
-    test_set = vect;
-}
-
-void knn::set_validation_set(std::vector<data *> *vect)
-{
-    val_set = vect;
-}
-
 void knn::set_k(int val)
 {
     k = val;
@@ -195,8 +180,8 @@ int main()
     knn_classifier->set_training_set(dh->get_training_data());
     knn_classifier->set_test_set(dh->get_testing_data());
     knn_classifier->set_validation_set(dh->get_validation_data());
-    double perf = 0;
-    double best_perf = 0;
+    double perf = 0.0;
+    double best_perf = 0.0;
     int best_k = 0;
     for (int i = 1; i <= 4; i++)
     {

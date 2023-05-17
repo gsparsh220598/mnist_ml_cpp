@@ -166,6 +166,11 @@ uint32_t data_handler::convert_to_little_endian(const unsigned char *bytes)
     return (uint32_t)((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]);
 }
 
+int data_handler::get_class_counts()
+{
+    return num_classes;
+}
+
 std::vector<data *> *data_handler::get_training_data()
 {
     return training_data;

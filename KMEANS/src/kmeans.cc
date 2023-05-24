@@ -37,19 +37,19 @@ void kmeans::init_clusters_for_each_class()
 
 void kmeans::train()
 {
-    while (used_idxs->size() < train_set->size())
+    while (used_idxs->size() < train_set->size()) // while not all points are used
     {
-        int idx = rand() % train_set->size();
+        int idx = rand() % train_set->size();            // get random idx
         while (used_idxs->find(idx) != used_idxs->end()) // while idx is already used
         {
             idx = rand() % train_set->size();
         }
         double min_dist = std::numeric_limits<double>::max();
         int best_cluster = 0;
-        for (int i = 0; i < clusters->size(); i++)
+        for (int i = 0; i < clusters->size(); i++) // find closest cluster
         {
             double dist = euclidean_distance(clusters->at(i)->centroid, train_set->at(idx));
-            if (dist < min_dist)
+            if (dist < min_dist) // if current cluster is closer than previous
             {
                 min_dist = dist;
                 best_cluster = i;

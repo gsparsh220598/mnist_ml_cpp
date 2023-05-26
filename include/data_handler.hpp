@@ -19,6 +19,7 @@ class data_handler
     int num_classes;                  // number of classes
     int feature_vector_size;          // size of feature vector
     std::map<uint8_t, int> class_map; // maps class to number of instances
+    std::map<std::string, int> classMap;
 
     const double TRAINING_DATA_SIZE = 0.75;
     const double TESTING_DATA_SIZE = 0.20;
@@ -28,6 +29,7 @@ public:
     data_handler();
     ~data_handler();
 
+    void read_csv(std::string path, std::string delimeter);
     void read_feature_vector(std::string path);
     void read_feature_labels(std::string path);
     void split_data();

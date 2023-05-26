@@ -7,9 +7,44 @@ data_handler::data_handler()
     testing_data = new std::vector<data *>();
     validation_data = new std::vector<data *>();
 }
+
 data_handler::~data_handler()
 {
     // Free dynamically allocated memory
+}
+
+void data_handler::read_csv(std::string path, std::string delimeter)
+{
+    num_classes = 0;
+    std::ifstream data_file(path.c_str());
+    std::string line; // each line of the csv file
+    while (std::getline(data_file, line))
+    {
+        if (line.length() == 0)
+            continue;
+        data *d = new data();
+        d->set_feature_vector(new std::vector<double>());
+        size_t position = 0;
+        std::string token; // value in betwewen delimeter
+        while ((position = line.find(delimeter)) != std::string::npos)
+        {
+            token = line.substr(0, position);
+            d->append_to_feature_vector(std::stod(token));
+            line.erase(0, position + delimeter.length());
+        }
+        if (classMap.find(line) != classMap.end())
+        {
+            d->set_label(classMap[line]);
+        }
+        else
+        {
+            classMap[line] = num_classes;
+            d->set_label(num_classes);
+            num_classes++;
+        }
+        data_array->push_back(d);
+    }
+    feature_vector_size = data_array->at(0)->get_double_feature_vector()->size();
 }
 
 void data_handler::read_feature_vector(std::string path)
@@ -156,6 +191,11 @@ void data_handler::count_classes()
         }
     }
     num_classes = count;
+    for (data *data : *data_array)
+    {
+        data->set_class_vector(num_classes);
+    }
+
     printf("Number of classes: %d\n", num_classes);
 }
 

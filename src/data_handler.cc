@@ -62,7 +62,9 @@ void data_handler::read_feature_vector(std::string path)
 {
     uint32_t header[4]; // 4 byte header (magic number, number of images, number of rows, number of columns)
     unsigned char bytes[4];
+    printf("Reading feature vector from %s\n", path.c_str());
     FILE *file = fopen(path.c_str(), "rb"); // c_str() converts string to char array
+
     if (file == NULL)
     {
         printf("Error opening feature file\n");

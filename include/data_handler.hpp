@@ -23,9 +23,9 @@ class data_handler
     std::map<std::string, int> classMap;
 
 public:
-    const double TRAINING_DATA_SIZE = 0.75;
-    const double TESTING_DATA_SIZE = 0.20;
-    const double VALIDATION_DATA_SIZE = 0.05;
+    const double TRAINING_DATA_SIZE = 0.1;
+    const double TESTING_DATA_SIZE = 0.075;
+    const double VALIDATION_DATA_SIZE = 0.005;
 
     data_handler();
     ~data_handler();

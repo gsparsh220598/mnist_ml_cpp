@@ -1,6 +1,6 @@
 CC=g++
 SRC := $(PWD)/src
-CFLAGS := -std=c++11 -g
+CFLAGS := -std=c++11 -g -DMNIST
 INCLUDE_DIR := $(PWD)/include/
 
 all: main

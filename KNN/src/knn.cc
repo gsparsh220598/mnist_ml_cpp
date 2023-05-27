@@ -33,36 +33,36 @@ void knn::find_knearest(data *query_point)
     {
         if (i == 0)
         {
-            for (int j = 0; j < train_set->size(); j++)
+            for (int j = 0; j < training_data->size(); j++)
             {
-                double distance = calc_distance(query_point, train_set->at(j)); // Calculate the distance between the query point and the data point
-                train_set->at(j)->set_distance(distance);                       // Set the distance of the data point
-                if (distance < min)                                             // Find the nearest neighbor
+                double distance = calc_distance(query_point, training_data->at(j)); // Calculate the distance between the query point and the data point
+                training_data->at(j)->set_distance(distance);                       // Set the distance of the data point
+                if (distance < min)                                                 // Find the nearest neighbor
                 {
                     min = distance;
                     idx = j;
                 }
             }
-            neighbors->push_back(train_set->at(idx)); // Add the nearest neighbor to the vector
-            prev_min = min;                           // Save the previous min
-            min = std::numeric_limits<double>::max(); // Reset min
+            neighbors->push_back(training_data->at(idx)); // Add the nearest neighbor to the vector
+            prev_min = min;                               // Save the previous min
+            min = std::numeric_limits<double>::max();     // Reset min
         }
         else
         {
-            for (int j = 0; j < train_set->size(); j++)
+            for (int j = 0; j < training_data->size(); j++)
             {
 
-                double distance = train_set->at(j)->get_distance(); // Calculate the distance between the query point and the data point
-                train_set->at(j)->set_distance(distance);           // Set the distance of the data point
-                if (distance < min && distance > prev_min)          // Find the nearest neighbor
+                double distance = training_data->at(j)->get_distance(); // Calculate the distance between the query point and the data point
+                training_data->at(j)->set_distance(distance);           // Set the distance of the data point
+                if (distance < min && distance > prev_min)              // Find the nearest neighbor
                 {
                     min = distance;
                     idx = j;
                 }
             }
-            neighbors->push_back(train_set->at(idx)); // Add the nearest neighbor to the vector
-            prev_min = min;                           // Save the previous min
-            min = std::numeric_limits<double>::max(); // Reset min
+            neighbors->push_back(training_data->at(idx)); // Add the nearest neighbor to the vector
+            prev_min = min;                               // Save the previous min
+            min = std::numeric_limits<double>::max();     // Reset min
         }
     }
 }
@@ -131,7 +131,7 @@ double knn::validate_performance()
     double curr_perf = 0;
     int count = 0;
     int data_idx = 0;
-    for (data *query_point : *val_set) // Iterate through the validation set
+    for (data *query_point : *validation_data) // Iterate through the validation set
     {
         find_knearest(query_point);
         int prediction = predict();
@@ -143,7 +143,7 @@ double knn::validate_performance()
         data_idx++;
         printf("Current Performance: %.3f %%\n", ((double)count * 100) / ((double)data_idx));
     }
-    curr_perf = ((double)count * 100) / ((double)val_set->size());
+    curr_perf = ((double)count * 100) / ((double)validation_data->size());
     printf("Valiation Performance for K = %d: %.3f %%\n", k, curr_perf);
     return curr_perf;
 }
@@ -153,7 +153,7 @@ double knn::test_performance()
     double curr_perf = 0;
     int count = 0;
     int data_idx = 0;
-    for (data *query_point : *test_set) // Iterate through the test set
+    for (data *query_point : *testing_data) // Iterate through the test set
     {
         find_knearest(query_point);
         int prediction = predict();
@@ -164,7 +164,7 @@ double knn::test_performance()
         data_idx++; // Count the number of data points
         printf("Current Performance: %.3f %%\n", ((double)count * 100) / ((double)data_idx));
     }
-    curr_perf = ((double)count * 100) / ((double)test_set->size());
+    curr_perf = ((double)count * 100) / ((double)testing_data->size());
     printf("Testing Performance: %.3f %%\n", curr_perf);
     return curr_perf;
 }
@@ -177,9 +177,9 @@ int main()
     dh->split_data();
     dh->count_classes();
     knn *knn_classifier = new knn();
-    knn_classifier->set_training_set(dh->get_training_data());
-    knn_classifier->set_test_set(dh->get_testing_data());
-    knn_classifier->set_validation_set(dh->get_validation_data());
+    knn_classifier->set_training_data(dh->get_training_data());
+    knn_classifier->set_test_data(dh->get_testing_data());
+    knn_classifier->set_validation_data(dh->get_validation_data());
     double perf = 0.0;
     double best_perf = 0.0;
     int best_k = 0;

@@ -1,16 +1,16 @@
-#include "common.hpp"
+#include "../include/common.hpp"
 
-void common_data::set_training_set(std::vector<data *> *vect)
+void common_data::set_training_data(std::vector<data *> *vect)
 {
-    train_set = vect;
+    training_data = vect;
 }
 
-void common_data::set_test_set(std::vector<data *> *vect)
+void common_data::set_test_data(std::vector<data *> *vect)
 {
-    test_set = vect;
+    testing_data = vect;
 }
 
-void common_data::set_validation_set(std::vector<data *> *vect)
+void common_data::set_validation_data(std::vector<data *> *vect)
 {
-    val_set = vect;
+    validation_data = vect;
 }

@@ -1,4 +1,6 @@
-#include "data_handler.hpp"
+#include "../include/data_handler.hpp"
+#include <algorithm>
+#include <random>
 
 data_handler::data_handler()
 {
@@ -16,20 +18,27 @@ data_handler::~data_handler()
 void data_handler::read_csv(std::string path, std::string delimeter)
 {
     num_classes = 0;
-    std::ifstream data_file(path.c_str());
+    std::ifstream data_file;
+    // printf("Reading data from %s\n", path.c_str());
+    data_file.open(path.c_str());
+    printf("Reading data from %s\n", path.c_str());
     std::string line; // each line of the csv file
+
     while (std::getline(data_file, line))
     {
         if (line.length() == 0)
+        {
+            printf("Empty line\n");
             continue;
+        }
         data *d = new data();
-        d->set_feature_vector(new std::vector<double>());
+        d->set_normalized_feature_vector(new std::vector<double>());
         size_t position = 0;
         std::string token; // value in betwewen delimeter
         while ((position = line.find(delimeter)) != std::string::npos)
         {
             token = line.substr(0, position);
-            d->append_to_feature_vector(std::stod(token));
+            d->append_to_feature_vector(std::stod(token)); // will throw exception if token is not a number, header
             line.erase(0, position + delimeter.length());
         }
         if (classMap.find(line) != classMap.end())
@@ -39,12 +48,14 @@ void data_handler::read_csv(std::string path, std::string delimeter)
         else
         {
             classMap[line] = num_classes;
-            d->set_label(num_classes);
+            d->set_label(classMap[line]);
             num_classes++;
         }
         data_array->push_back(d);
     }
-    feature_vector_size = data_array->at(0)->get_double_feature_vector()->size();
+    for (data *d : *data_array)
+        d->set_class_vector(num_classes);
+    feature_vector_size = data_array->at(0)->get_normalized_feature_vector()->size();
 }
 
 void data_handler::read_feature_vector(std::string path)
@@ -134,17 +145,17 @@ void data_handler::split_data()
     int testing_size = data_array->size() * TESTING_DATA_SIZE;
     int validation_size = data_array->size() * VALIDATION_DATA_SIZE;
 
+    std::random_shuffle(data_array->begin(), data_array->end());
+
     // Training data
     int count = 0;
+    int idx = 0;
     while (count < training_size)
     {
-        int rand_index = rand() % data_array->size();
-        if (used_indices.find(rand_index) == used_indices.end())
-        {
-            training_data->push_back(data_array->at(rand_index));
-            used_indices.insert(rand_index);
-            count++;
-        }
+        training_data->push_back(data_array->at(idx));
+        used_indices.insert(idx);
+        count++;
+        idx++;
     }
 
     // Testing data
@@ -206,9 +217,99 @@ uint32_t data_handler::convert_to_little_endian(const unsigned char *bytes)
     return (uint32_t)((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]);
 }
 
+void data_handler::normalize()
+{
+    std::vector<double> mins, maxs;
+
+    data *d = data_array->at(0);
+    for (auto val : *d->get_feature_vector())
+    {
+        mins.push_back(val);
+        maxs.push_back(val);
+    }
+
+    // Find min and max values for each feature
+    for (int i = 1; i < data_array->size(); ++i)
+    {
+        d = data_array->at(i);
+        for (int j = 0; j < d->get_feature_vector_size(); ++j) // For each feature
+        {
+            double value = (double)d->get_feature_vector()->at(j);
+            if (value < mins[j])
+                mins[j] = value;
+            if (value > maxs[j])
+                maxs[j] = value;
+        }
+    }
+
+    // Normalize each feature
+    for (int i = 0; i < data_array->size(); ++i)
+    {
+        data_array->at(i)->set_normalized_feature_vector(new std::vector<double>());
+        data_array->at(i)->set_class_vector(num_classes);
+        for (int j = 0; j < data_array->at(i)->get_feature_vector_size(); ++j)
+        {
+            if (maxs[j] - mins[j] == 0)
+                data_array->at(i)->append_to_feature_vector(0.0);
+            else
+                data_array->at(i)->append_to_feature_vector(
+                    (double)(data_array->at(i)->get_feature_vector()->at(j) - mins[j]) / (maxs[j] - mins[j]));
+        }
+    }
+}
+
+void data_handler::print_data()
+{
+    printf("Printing Training data\n");
+    for (auto data : *training_data)
+    {
+        for (auto val : *data->get_normalized_feature_vector())
+        {
+            printf("%.3f ", val);
+        }
+        printf("-> %d\n", data->get_label());
+    }
+    return;
+
+    printf("Printing Testing data\n");
+    for (auto data : *testing_data)
+    {
+        for (auto val : *data->get_normalized_feature_vector())
+        {
+            printf("%.3f ", val);
+        }
+        printf("-> %d\n", data->get_label());
+    }
+
+    printf("Printing Validation data\n");
+    for (auto data : *validation_data)
+    {
+        for (auto val : *data->get_normalized_feature_vector())
+        {
+            printf("%.3f ", val);
+        }
+        printf("-> %d\n", data->get_label());
+    }
+}
+
 int data_handler::get_class_counts()
 {
     return num_classes;
+}
+
+int data_handler::get_training_data_size()
+{
+    return training_data->size();
+}
+
+int data_handler::get_testing_data_size()
+{
+    return testing_data->size();
+}
+
+int data_handler::get_validation_data_size()
+{
+    return validation_data->size();
 }
 
 std::vector<data *> *data_handler::get_training_data()
@@ -225,13 +326,8 @@ std::vector<data *> *data_handler::get_validation_data()
 {
     return validation_data;
 }
-/*
-int main()
+
+std::map<u_int8_t, int> data_handler::get_class_map()
 {
-    data_handler *dh = new data_handler();
-    dh->read_feature_vector("./train-images.idx3-ubyte");
-    dh->read_feature_labels("./train-labels.idx1-ubyte");
-    dh->split_data();
-    dh->count_classes();
+    return class_map;
 }
-*/

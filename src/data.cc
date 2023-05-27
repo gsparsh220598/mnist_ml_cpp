@@ -1,4 +1,4 @@
-#include "data.hpp"
+#include "../include/data.hpp"
 
 data::data()
 {
@@ -16,19 +16,38 @@ void data::append_to_feature_vector(uint8_t val)
 {
     feature_vector->push_back(val);
 }
-void data::set_feature_vector(std::vector<double> *vect)
+void data::set_normalized_feature_vector(std::vector<double> *vect)
 {
-    double_feature_vector = vect;
+    normalized_feature_vector = vect;
 }
 void data::append_to_feature_vector(double val)
 {
-    double_feature_vector->push_back(val);
+    normalized_feature_vector->push_back(val);
 }
 void data::set_label(uint8_t val)
 {
     label = val;
 }
-void data::set_enum_label(int val)
+
+void data::print_vector()
+{
+    for (int i = 0; i < feature_vector->size(); i++)
+    {
+        printf("%d ", feature_vector->at(i));
+    }
+    printf("\n");
+}
+
+void data::print_normalized_vector()
+{
+    for (int i = 0; i < normalized_feature_vector->size(); i++)
+    {
+        printf("%f ", normalized_feature_vector->at(i));
+    }
+    printf("\n");
+}
+
+void data::set_enum_label(uint8_t val)
 {
     enum_label = val;
 }
@@ -61,7 +80,7 @@ void data::set_class_vector(int count)
     }
 }
 
-int data::get_enum_label()
+uint8_t data::get_enum_label()
 {
     return enum_label;
 }
@@ -70,14 +89,14 @@ std::vector<uint8_t> *data::get_feature_vector()
     return feature_vector;
 }
 
-std::vector<double> *data::get_double_feature_vector()
+std::vector<double> *data::get_normalized_feature_vector()
 {
-    return double_feature_vector;
+    return normalized_feature_vector;
 }
 
-std::vector<int> *data::get_class_vector()
+std::vector<int> data::get_class_vector()
 {
-    return class_vector;
+    return *class_vector;
 }
 
 double data::get_distance()

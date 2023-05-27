@@ -1,4 +1,4 @@
-#include "../include/knn.hpp"
+#include "knn.hpp"
 #include <cmath>
 #include <limits>
 #include <map>
